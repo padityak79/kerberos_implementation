@@ -30,6 +30,8 @@ bob_packet = bob_tgs_d_crypt.decrypt(bob_packet).decode('utf-8')
 
 client_name, alice_bob_session_key = bob_packet.split(' ')
 
+print('recieved session key from Alice encrypted by bob-tgs key', alice_bob_session_key)
+
 alice_bob_nonce = client.recv(55)
 client.send('ACK'.encode('utf-8'))
 
@@ -40,9 +42,13 @@ alice_bob_d_crypt = AES.new(alice_bob_session_key.encode('utf-8'), AES.MODE_EAX,
 recieved_timestamp = alice_bob_d_crypt.decrypt(encrypted_timestamp).decode('utf-8')
 recieved_timestamp = float(recieved_timestamp)
 
+print('recieved timestamp from Alice', recieved_timestamp)
+
 recieved_timestamp -= 1.0
 alice_bob_cipher = AES.new(alice_bob_session_key.encode('utf-8'), AES.MODE_EAX, alice_bob_nonce)
 encrypted_timestamp = alice_bob_cipher.encrypt(str(recieved_timestamp).encode('utf-8'))
+
+print('sending timestamp to Alice', recieved_timestamp)
 
 client.send(encrypted_timestamp)
 client.recv(50)

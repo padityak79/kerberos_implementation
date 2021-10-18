@@ -26,17 +26,19 @@ print('Connected to : ', client.recv(100))
 client.send('ACK connection request reieved'.encode('utf-8'))
 
 as_tgs_ticket = 'Alice ' + alice_tgs_key
+print('As-Tgs ticket \'' + as_tgs_ticket + '\' to Alice encrypted with As-Tgs key')
 as_tgs_ticket = as_tgs_ticket.encode('utf-8')
 # print(as_tgs_ticket)
 as_tgs_cipher = AES.new(as_tgs_key, AES.MODE_EAX)
 
 as_tgs_ticket = as_tgs_cipher.encrypt(as_tgs_ticket)
-print(as_tgs_ticket)
-print(as_tgs_cipher.nonce)
+# print(as_tgs_ticket)
+# print(as_tgs_cipher.nonce)
 
 
 alice_as_cipher = AES.new(alice_as_key,AES.MODE_EAX)
 
+print('Sending alice-tgs key \'' + alice_tgs_key + '\' encrypted with Alice-As Key')
 
 alice_tgs_key = alice_tgs_key.encode('utf-8')
 # print(alice_tgs_key)

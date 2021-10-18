@@ -29,15 +29,15 @@ client.send('ACK'.encode('utf-8'))
 encrypted_as_tgs_ticket = client.recv(55)
 client.send('ACK'.encode('utf-8'))
 
-print(as_tgs_nonce)
-print(encrypted_as_tgs_ticket)
+# print(as_tgs_nonce)
+# print(encrypted_as_tgs_ticket)
 
 as_tgs_d_crypt = AES.new(as_tgs_key, AES.MODE_EAX, as_tgs_nonce)
 alice_tgs_ticket = as_tgs_d_crypt.decrypt(encrypted_as_tgs_ticket).decode('utf-8')
 
 client_name, alice_tgs_key = alice_tgs_ticket.split(' ')
 print('Request by :', client_name)
-print(alice_tgs_key)
+print('recieved ALice-Tgs key \'' + alice_tgs_key + '\' from Alice encrypted with As-Tgs key')
 
 alice_tgs_nonce = client.recv(55)
 client.send('ACK'.encode('utf-8'))
@@ -46,6 +46,7 @@ encrypted_timestamp = client.recv(55)
 alice_tgs_d_crypt = AES.new(alice_tgs_key.encode('utf-8'), AES.MODE_EAX, alice_tgs_nonce)
 recieved_timestamp = alice_tgs_d_crypt.decrypt(encrypted_timestamp).decode('utf-8')
 
+print('recieved timestamp \'' + recieved_timestamp + '\' from Alice')
 
 if time.time() - float(recieved_timestamp) > 0.5 : 
     client.send('request failed'.encode('utf-8'))
@@ -55,6 +56,7 @@ else :
     client.recv(50)
     alice_tgs_cipher = AES.new(alice_tgs_key.encode('utf-8'),AES.MODE_EAX)
     alice_packet = 'Bob ' + alice_bob_session_key
+    print('sending Alice\'s packet \'' + alice_packet + '\' to Alice')
     alice_packet = alice_packet.encode('utf-8')
     encrypted_alice_packet = alice_tgs_cipher.encrypt(alice_packet)
     client.send(alice_tgs_cipher.nonce)
@@ -64,6 +66,7 @@ else :
 
     bob_tgs_cipher = AES.new(bob_tgs_key.encode('utf-8'),AES.MODE_EAX)
     bob_packet = 'Alice ' + alice_bob_session_key
+    print('sending Bob\s packet \'' + bob_packet + '\' to Alice')
     bob_packet = bob_packet.encode('utf-8')
     encrypted_bob_packet = bob_tgs_cipher.encrypt(bob_packet)
     client.send(bob_tgs_cipher.nonce)

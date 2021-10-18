@@ -34,7 +34,7 @@ print('recieved alice-tgs key' , alice_tgs_key)
 # print(encrypted_alice_tgs_key)
 as_tgs_nonce = s1.recv(49)
 s1.send('ACK'.encode('utf-8'))
-print(as_tgs_nonce)
+# print(as_tgs_nonce)
 encrypted_as_tgs_ticket = s1.recv(55)
 s1.send('ACK'.encode('utf-8'))
 # print(encrypted_as_tgs_ticket)
@@ -42,7 +42,7 @@ as_tgs_ticket = d_cipher.decrypt(encrypted_as_tgs_ticket)
 print('recieved as-tgs ticket encrypted with as-tgs key',as_tgs_ticket)
 alice_tgs_cipher = AES.new(alice_tgs_key.encode('utf-8'),AES.MODE_EAX)
 timestamp = time.time()
-print(timestamp)
+print('Sending timestamp \'' + str(timestamp) + '\' to tgs server')
 encrypted_timestamp = alice_tgs_cipher.encrypt(str(timestamp).encode('utf-8'))
 
 s2 = socket.socket()
@@ -59,7 +59,7 @@ s2.recv(50)
 
 s2.send(alice_tgs_cipher.nonce)
 s2.recv(50)
-print('sending timestamp ' + str(timestamp) + ' as nonce to tgs server')
+print('sending timestamp \'' + str(timestamp) + '\' as nonce to tgs server')
 s2.send(encrypted_timestamp)
 response = s2.recv(70).decode('utf-8') 
 if response == 'request failed' : 
@@ -90,7 +90,7 @@ else :
     
     alice_bob_cipher = AES.new(alice_bob_session_key.encode('utf-8'), AES.MODE_EAX)
     timestamp = time.time()
-    print('Sending Timestamp to Bob : ' + str(timestamp) + ' as a nonce to Bob')
+    print('Sending Timestamp to Bob : \'' + str(timestamp) + '\' as a nonce to Bob')
     encrypted_timestamp = alice_bob_cipher.encrypt(str(timestamp).encode('utf-8'))
 
     s3.send(alice_bob_cipher.nonce)
@@ -104,6 +104,6 @@ else :
     encrypted_timestamp = s3.recv(55)
     recieved_timestamp = alice_bob_cipher.decrypt(encrypted_timestamp).decode('utf-8')
     if timestamp - float(recieved_timestamp) == 1 : 
-        print('recieved nonce ' + recieved_timestamp + ' gaurentees that the connection with bob is secured safely!!')
+        print('recieved nonce(timestamp-1) \'' + recieved_timestamp + '\' guarentees that the connection with bob is secured safely!!')
     else : 
         print('Connection with Bob failed!!') 
